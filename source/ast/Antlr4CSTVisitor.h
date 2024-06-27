@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AST.h"
+#include "AstNode.h"
 #include "sysyBaseVisitor.h"
 
 class sysyCSTVisitor : public sysyBaseVisitor

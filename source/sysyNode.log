@@ -1,0 +1,86 @@
+grammar sysyNode;
+
+compileUnit: (decl | const_decl | func_def)*;
+decl: (identifier)+; //definition
+const_decl: (identifier)+; //definition
+
+identifier: (expr?) //definition
+	| (const_expr?) //definition
+	| (array_dim array_init) //definition
+	| (array_dim) //Reference
+	|; //Reference
+
+func_form_param:
+	(array_dim array_init) //definition
+	|; //definition
+
+array_dim:
+	expr* //Reference
+	| const_expr*; //definition
+array_init: init_level;
+init_level: (expr* | const_expr*) | init_level*;
+
+func_def: func_form_params block;
+func_form_params: (func_form_param)*; //definition
+
+block: (decl | statement | block)*;
+statement:
+	assign
+	| stmt_expr
+	| if
+	| while
+	| break
+	| continue
+	| return;
+
+assign: identifier expr; //Reference
+stmt_expr: expr;
+if: cond_expr block block?;
+while: cond_expr block;
+break:;
+continue:;
+return: expr?;
+
+cond_expr:
+	identifier //Reference
+	| func_call
+	| operator
+	| T_INT_CONST_TYPE;
+
+const_expr:
+	identifier //Reference
+	| func_call
+	| operator
+	| T_INT_CONST_TYPE;
+expr:
+	identifier //Reference
+	| func_call
+	| operator
+	| T_INT_CONST_TYPE;
+
+operator: (
+		identifier //Reference
+		| func_call
+		| operator
+		| T_INT_CONST_TYPE
+	)+; //[1~2个]
+
+func_call: func_real_params;
+func_real_params: expr*;
+T_INT_CONST_TYPE: [1-9][0-9]*;
+T_OPERATOR:
+	'+'
+	| '-'
+	| '*'
+	| '/'
+	| '&&'
+	| '||'
+	| '!='
+	| '=='
+	| '>'
+	| '<'
+	| '>='
+	| '<='
+	| '!';
+
+warning: nowarning;

@@ -11,3 +11,6 @@ test:
 	@cp ./demo/1 ./demo/1.cpp
 	@g++ ./demo/1.cpp -o ./out/1.exe
 	@./out/1.exe
+llvm:
+	@cp ./demo/1 ./demo/1.cpp
+	@clang -emit-llvm -c -S ./demo/1.cpp -o ./out/1.ll

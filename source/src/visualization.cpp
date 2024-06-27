@@ -1,4 +1,5 @@
 #include "visualization.h"
+#include <iostream>
 void viz::PrintAst(AstNode *root)
 {
     std::cout << "Printing ast" << std::endl;

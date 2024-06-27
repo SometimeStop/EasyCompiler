@@ -33,29 +33,50 @@ set(ANTLR4_OUTPUT
 
 set(FRONTEND_SRC
     ${ANTLR4_OUTPUT}
-    source/ast/AST.cpp
-    source/ast/AST.h
+    source/ast/AstFunc.cpp
+    source/ast/AstFunc.h
+    source/ast/AstNode.cpp
+    source/ast/AstNode.h
+    source/ast/OperatorNode.cpp
+    source/ast/OperatorNode.h
+    source/ast/StmtNode.cpp
+    source/ast/StmtNode.h
+    source/ast/Antlr4CSTVisitor.cpp
+    source/ast/Antlr4CSTVisitor.h
+    source/ast/AntlrExecutor.cpp
+    source/ast/AntlrExecutor.h
+
     source/src/visualization.cpp
     source/src/visualization.h
-    source/src/Antlr4CSTVisitor.cpp
-    source/src/Antlr4CSTVisitor.h
-    source/src/AntlrExecutor.cpp
-    source/src/AntlrExecutor.h
+)
+
+set(IRGENERATE_SRC
+    source/llvmir/IRInstruction.cpp
+    source/llvmir/IRInstruction.h
+)
+
+set(SYMBOLTABLE_SRC
+    source/SymbolTable/Var.h
+    source/SymbolTable/Var.cpp
 )
 
 set(GLOBAL_SRC
     global/type.cpp
     global/type.h
+    global/VarType.cpp
+    global/VarType.h
 )
 
 add_executable(${PROJECT_NAME}
     source/src/main.cpp
     ${FRONTEND_SRC}
     ${GLOBAL_SRC}
+    ${IRGENERATE_SRC}
+    ${SYMBOLTABLE_SRC}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_EXTENSIONS OFF
     CXX_STANDARD_REQUIRED ON
 )
@@ -66,6 +87,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     source/autogen
     source/src
     source/ast
+    source/llvmir
+    source/SymbolTable
     global
 )
 

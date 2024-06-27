@@ -1,7 +1,7 @@
 #include "AntlrExecutor.h"
 #include <string>
 #include <iostream>
-#include "AST.h"
+#include "AstNode.h"
 #include "visualization.h"
 int main()
 {
@@ -16,14 +16,15 @@ int main()
         std::cout << "Generate ast error!" << std::endl;
         return 0;
     }
-    std::cout << "Generate complete!" << std::endl;
+    std::cout << "[Ast] Generate complete!" << std::endl;
     std::string visualization;
-    std::cout << "Visualize?[y/N]";
+    std::cout << "[Ast] Visualize? [Y(default)/n]: ";
     std::cin >> visualization;
-    if (visualization == "y")
+    if (visualization != "n")
     {
         viz::PrintAst(rootNode);
     }
-    std::cout << "Done!" << std::endl;
+    std::cout << "[Ast] Done!" << std::endl;
+
     return 0;
 }

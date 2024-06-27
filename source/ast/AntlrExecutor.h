@@ -1,5 +1,6 @@
+#pragma once
 #include <string>
-#include "AST.h"
+#include "AstNode.h"
 class AntlrExecutor
 {
 private:

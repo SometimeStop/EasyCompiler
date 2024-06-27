@@ -1,5 +1,7 @@
 #include "Antlr4CSTVisitor.h"
-
+#include "AstFunc.h"
+#include "OperatorNode.h"
+#include "StmtNode.h"
 #define Instanceof(res, type, var) auto res = dynamic_cast<type>(var)
 
 sysyCSTVisitor::sysyCSTVisitor()
@@ -89,16 +91,27 @@ std::any sysyCSTVisitor::visitConstDef(sysyParser::ConstDefContext *ctx)
     auto token = ctx->getStart();
     unsigned int lineno = token->getLine();
 
-    AstNode *constDefNode = new AstNode((char *)ctx->T_ID()->getText().c_str(), (int32_t)lineno);
+    AstNode *constDefNode = new AstNode(ctx->T_ID()->getText(), (int32_t)lineno);
     if (ctx->constExpr().empty())
     {
         auto constVarNode = std::any_cast<AstNode *>(visitConstInitVal(ctx->constInitVal()));
         ast::InsertAstNode(constDefNode, constVarNode);
         return constDefNode;
     }
-    else // FIXME:array operation!!!
+    else
     {
-        assert(false);
+        AstNode *dimNode = ast::CreateDimNode();
+        for (auto dim : ctx->constExpr())
+        {
+            auto tmpNode = std::any_cast<AstNode *>(visitConstExpr(dim));
+            ast::InsertAstNode(dimNode, tmpNode);
+        }
+        AstNode *initValNode = ast::CreateArrayInitValNode();
+        auto initValues = std::any_cast<AstNode *>(visitConstInitVal(ctx->constInitVal()));
+        ast::InsertAstNode(initValNode, initValues);
+        ast::InsertAstNode(constDefNode, dimNode);
+        ast::InsertAstNode(constDefNode, initValNode);
+        return constDefNode;
     }
 }
 
@@ -109,14 +122,15 @@ std::any sysyCSTVisitor::visitConstInitVal(sysyParser::ConstInitValContext *ctx)
     {
         return visitConstExpr(ctx->constExpr());
     }
-    else if (ctx->constInitVal().empty())
-    {
-        return nullptr;
-    }
     else
     {
-        assert(false);
-        // FIXME:array operation!!!
+        auto initDimNode = ast::CreateInitDimNode();
+        for (auto initVal : ctx->constInitVal())
+        {
+            auto tmpNode = std::any_cast<AstNode *>(visitConstInitVal(initVal));
+            ast::InsertAstNode(initDimNode, tmpNode);
+        }
+        return initDimNode;
     }
 }
 
@@ -140,7 +154,7 @@ std::any sysyCSTVisitor::visitVarDef(sysyParser::VarDefContext *ctx)
     auto token = ctx->getStart();
     unsigned int lineno = token->getLine();
 
-    AstNode *varDefNode = new AstNode((char *)ctx->T_ID()->getText().c_str(), (int32_t)lineno);
+    AstNode *varDefNode = new AstNode(ctx->T_ID()->getText(), (int32_t)lineno);
     if (ctx->initVal()) // branch 2: initVal has val
     {
         if (ctx->constExpr().empty())
@@ -149,22 +163,40 @@ std::any sysyCSTVisitor::visitVarDef(sysyParser::VarDefContext *ctx)
             ast::InsertAstNode(varDefNode, std::any_cast<AstNode *>(initValNode));
             return varDefNode;
         }
-        else // FIXME:array operation!!!
+        else
         {
-            assert(false);
+            AstNode *dimNode = ast::CreateDimNode();
+            for (auto dim : ctx->constExpr())
+            {
+                auto tmpNode = std::any_cast<AstNode *>(visitConstExpr(dim));
+                ast::InsertAstNode(dimNode, tmpNode);
+            }
+            AstNode *initValNode = ast::CreateArrayInitValNode();
+            auto initValues = std::any_cast<AstNode *>(visitInitVal(ctx->initVal()));
+            ast::InsertAstNode(initValNode, initValues);
+            ast::InsertAstNode(varDefNode, dimNode);
+            ast::InsertAstNode(varDefNode, initValNode);
+            return varDefNode;
         }
     }
     else // branch 1: initVal has NO val
     {
         if (ctx->constExpr().empty())
         {
-            AstNode *zeroInitValNode = new AstNode((uint32_t)0);
-            ast::InsertAstNode(varDefNode, zeroInitValNode);
             return varDefNode;
         }
-        else // FIXME:array operation!!!
+        else
         {
-            assert(false);
+            AstNode *dimNode = ast::CreateDimNode();
+            for (auto dim : ctx->constExpr())
+            {
+                auto tmpNode = std::any_cast<AstNode *>(visitConstExpr(dim));
+                ast::InsertAstNode(dimNode, tmpNode);
+            }
+            AstNode *initValNode = ast::CreateArrayInitValNode();
+            ast::InsertAstNode(varDefNode, dimNode);
+            ast::InsertAstNode(varDefNode, initValNode);
+            return varDefNode;
         }
     }
 }
@@ -177,8 +209,13 @@ std::any sysyCSTVisitor::visitInitVal(sysyParser::InitValContext *ctx)
     }
     else
     {
-        // FIXME:array operation!!!
-        assert(false);
+        auto initDimNode = ast::CreateInitDimNode();
+        for (auto initVal : ctx->initVal())
+        {
+            auto tmpNode = std::any_cast<AstNode *>(visitInitVal(initVal));
+            ast::InsertAstNode(initDimNode, tmpNode);
+        }
+        return initDimNode;
     }
 }
 
@@ -198,7 +235,7 @@ std::any sysyCSTVisitor::visitFuncDef(sysyParser::FuncDefContext *ctx)
 
     AstNode *blockNode = std::any_cast<AstNode *>(visitBlock(ctx->block()));
 
-    return ast::CreateFuncDefNode(lineno, btype, name.c_str(), blockNode, funcFormParamsNode);
+    return ast::CreateFuncDefNode(lineno, btype, name, blockNode, funcFormParamsNode);
 }
 
 std::any sysyCSTVisitor::visitFuncType(sysyParser::FuncTypeContext *ctx)
@@ -252,19 +289,29 @@ std::any sysyCSTVisitor::visitFuncBasicParam(sysyParser::FuncBasicParamContext *
     BasicType btype = std::any_cast<BasicType>(visitBType(ctx->bType()));
     std::string name = ctx->T_ID()->getText();
 
-    return ast::CreateFuncBasicParamsNode(lineno, btype, name.c_str());
+    return ast::CreateFuncParamNode(lineno, btype, name);
 }
 
 std::any sysyCSTVisitor::visitFuncArrayParam(sysyParser::FuncArrayParamContext *ctx)
 {
-    // FIXME:array operation!!!
-    assert(false);
-    return std::any();
+    auto token = ctx->getStart();
+    unsigned int lineno = token->getLine();
+    BasicType btype = std::any_cast<BasicType>(visitBType(ctx->bType()));
+    std::string name = ctx->T_ID()->getText();
+    auto arrayParamNode = ast::CreateFuncParamNode(lineno, btype, name);
+    AstNode *dimNode = ast::CreateDimNode();
+    for (auto dim : ctx->expr())
+    {
+        auto tmpNode = std::any_cast<AstNode *>(visitExpr(dim));
+        ast::InsertAstNode(dimNode, tmpNode);
+    }
+    ast::InsertAstNode(arrayParamNode, dimNode);
+    return arrayParamNode;
 }
 
 std::any sysyCSTVisitor::visitBlock(sysyParser::BlockContext *ctx)
 {
-    auto blockNode = new AstNode(AstNodeType::BlockType);
+    AstNode *blockNode = new AstNode(AstNodeType::BlockType);
     for (auto &blockItem : ctx->blockItem())
     {
         auto tmpNode = visitBlockItem(blockItem);
@@ -342,22 +389,22 @@ std::any sysyCSTVisitor::visitExprStmt(sysyParser::ExprStmtContext *ctx)
     if (ctx->expr())
     {
         auto exprNode = std::any_cast<AstNode *>(visitExpr(ctx->expr()));
-        return exprNode;
+        return ast::CreateExprStmtNode(exprNode);
     }
     else
     {
-        return ast::CreateExprEntryNode();
+        return ast::CreateExprStmtNode();
     }
 }
 
 std::any sysyCSTVisitor::visitBlockStmt(sysyParser::BlockStmtContext *ctx)
 {
-    return visitBlock(ctx->block());
+    return std::any_cast<AstNode *>(visitBlock(ctx->block()));
 }
 
 std::any sysyCSTVisitor::visitIfStmt(sysyParser::IfStmtContext *ctx)
 {
-    AstNode *ifNode = new AstNode(AstNodeType::IfType);
+    AstNode *ifNode = new StmtNode(StmtType::StmtIf);
     auto condNode = std::any_cast<AstNode *>(visitCond(ctx->cond()));
     ast::InsertAstNode(ifNode, condNode);
     for (auto &stmtCtx : ctx->stmt())
@@ -370,7 +417,7 @@ std::any sysyCSTVisitor::visitIfStmt(sysyParser::IfStmtContext *ctx)
 
 std::any sysyCSTVisitor::visitWhileStmt(sysyParser::WhileStmtContext *ctx)
 {
-    AstNode *whileNode = new AstNode(AstNodeType::WhileType);
+    AstNode *whileNode = new StmtNode(StmtType::StmtWhile);
     auto condNode = std::any_cast<AstNode *>(visitCond(ctx->cond()));
     auto stmtNode = std::any_cast<AstNode *>(visitStmt(ctx->stmt()));
     ast::InsertAstNode(whileNode, condNode);
@@ -380,13 +427,13 @@ std::any sysyCSTVisitor::visitWhileStmt(sysyParser::WhileStmtContext *ctx)
 
 std::any sysyCSTVisitor::visitBreakStmt(sysyParser::BreakStmtContext *ctx)
 {
-    AstNode *breakNode = new AstNode(AstNodeType::BreakType);
+    AstNode *breakNode = new StmtNode(StmtType::StmtBreak);
     return breakNode;
 }
 
 std::any sysyCSTVisitor::visitContinueStmt(sysyParser::ContinueStmtContext *ctx)
 {
-    AstNode *continueNode = new AstNode(AstNodeType::ContinueType);
+    AstNode *continueNode = new StmtNode(StmtType::StmtContinue);
     return continueNode;
 }
 
@@ -424,13 +471,20 @@ std::any sysyCSTVisitor::visitLVal(sysyParser::LValContext *ctx)
 
     if (ctx->expr().empty())
     {
-        AstNode *node = new AstNode((char *)name.c_str(), lineno);
+        AstNode *node = new AstNode(name, lineno, true);
         return node;
     }
     else
     {
-        // FIXME:array operation!!!
-        assert(false);
+        AstNode *node = new AstNode(name, lineno, true);
+        AstNode *dimNode = ast::CreateDimNode();
+        for (auto dim : ctx->expr())
+        {
+            auto tmpNode = std::any_cast<AstNode *>(visitExpr(dim));
+            ast::InsertAstNode(dimNode, tmpNode);
+        }
+        ast::InsertAstNode(node, dimNode);
+        return node;
     }
 }
 
@@ -467,7 +521,7 @@ std::any sysyCSTVisitor::visitUnaryExpr(sysyParser::UnaryExprContext *ctx)
     }
     else if (ctx->unaryOp())
     {
-        AstNodeType type = std::any_cast<AstNodeType>(visitUnaryOp(ctx->unaryOp()));
+        OperatorType type = std::any_cast<OperatorType>(visitUnaryOp(ctx->unaryOp()));
         AstNode *lOperator = std::any_cast<AstNode *>(visitUnaryExpr(ctx->unaryExpr()));
         return ast::CreateExprNode(type, lOperator);
     }
@@ -478,29 +532,28 @@ std::any sysyCSTVisitor::visitUnaryExpr(sysyParser::UnaryExprContext *ctx)
         std::string name = ctx->T_ID()->getText();
         if (ctx->funcRealParams())
         {
-            return ast::CreateFuncCallNode(lineno, name.c_str(), std::any_cast<AstNode *>(visitFuncRealParams(ctx->funcRealParams())));
+            return ast::CreateFuncCallNode(lineno, name, std::any_cast<AstNode *>(visitFuncRealParams(ctx->funcRealParams())));
         }
         else
         {
-            return ast::CreateFuncCallNode(lineno, name.c_str());
+            return ast::CreateFuncCallNode(lineno, name);
         }
     }
 }
 
 std::any sysyCSTVisitor::visitUnaryOp(sysyParser::UnaryOpContext *ctx)
 {
-    AstNode *unaryOpNode = nullptr;
     if (ctx->T_ADD())
     {
-        return AstNodeType::OperatorPos;
+        return OperatorType::OperatorPos;
     }
     else if (ctx->T_SUB())
     {
-        return AstNodeType::OperatorNeg;
+        return OperatorType::OperatorNeg;
     }
     else if (ctx->T_NOT())
     {
-        return AstNodeType::OperatorNot;
+        return OperatorType::OperatorNot;
     }
     else
     {
@@ -524,7 +577,7 @@ std::any sysyCSTVisitor::visitMulExpr(sysyParser::MulExprContext *ctx)
     // mulExpr: unaryExpr | mulExpr mulOp unaryExpr;
     if (ctx->mulOp())
     {
-        AstNodeType type = std::any_cast<AstNodeType>(visitMulOp(ctx->mulOp()));
+        OperatorType type = std::any_cast<OperatorType>(visitMulOp(ctx->mulOp()));
         AstNode *lOperator = std::any_cast<AstNode *>(visitMulExpr(ctx->mulExpr()));
         AstNode *rOperator = std::any_cast<AstNode *>(visitUnaryExpr(ctx->unaryExpr()));
         return ast::CreateExprNode(type, lOperator, rOperator);
@@ -539,15 +592,15 @@ std::any sysyCSTVisitor::visitMulOp(sysyParser::MulOpContext *ctx)
 {
     if (ctx->T_MUL())
     {
-        return AstNodeType::OperatorMul;
+        return OperatorType::OperatorMul;
     }
     else if (ctx->T_DIV())
     {
-        return AstNodeType::OperatorDiv;
+        return OperatorType::OperatorDiv;
     }
     else if (ctx->T_MOD())
     {
-        return AstNodeType::OperatorMod;
+        return OperatorType::OperatorMod;
     }
     else
     {
@@ -559,7 +612,7 @@ std::any sysyCSTVisitor::visitAddExpr(sysyParser::AddExprContext *ctx)
 {
     if (ctx->addOp())
     {
-        AstNodeType type = std::any_cast<AstNodeType>(visitAddOp(ctx->addOp()));
+        OperatorType type = std::any_cast<OperatorType>(visitAddOp(ctx->addOp()));
         AstNode *lOperator = std::any_cast<AstNode *>(visitAddExpr(ctx->addExpr()));
         AstNode *rOperator = std::any_cast<AstNode *>(visitMulExpr(ctx->mulExpr()));
         return ast::CreateExprNode(type, lOperator, rOperator);
@@ -574,11 +627,11 @@ std::any sysyCSTVisitor::visitAddOp(sysyParser::AddOpContext *ctx)
 {
     if (ctx->T_ADD())
     {
-        return AstNodeType::OperatorAdd;
+        return OperatorType::OperatorAdd;
     }
     else if (ctx->T_SUB())
     {
-        return AstNodeType::OperatorSub;
+        return OperatorType::OperatorSub;
     }
     else
     {
@@ -590,7 +643,7 @@ std::any sysyCSTVisitor::visitRelationExpr(sysyParser::RelationExprContext *ctx)
 {
     if (ctx->relationOp())
     {
-        AstNodeType type = std::any_cast<AstNodeType>(visitRelationOp(ctx->relationOp()));
+        OperatorType type = std::any_cast<OperatorType>(visitRelationOp(ctx->relationOp()));
         AstNode *lOperator = std::any_cast<AstNode *>(visitRelationExpr(ctx->relationExpr()));
         AstNode *rOperator = std::any_cast<AstNode *>(visitAddExpr(ctx->addExpr()));
         return ast::CreateExprNode(type, lOperator, rOperator);
@@ -605,19 +658,19 @@ std::any sysyCSTVisitor::visitRelationOp(sysyParser::RelationOpContext *ctx)
 {
     if (ctx->T_LT())
     {
-        return AstNodeType::OperatorLT;
+        return OperatorType::OperatorLT;
     }
     else if (ctx->T_GT())
     {
-        return AstNodeType::OperatorGT;
+        return OperatorType::OperatorGT;
     }
     else if (ctx->T_LE())
     {
-        return AstNodeType::OperatorLE;
+        return OperatorType::OperatorLE;
     }
     else if (ctx->T_GE())
     {
-        return AstNodeType::OperatorGE;
+        return OperatorType::OperatorGE;
     }
     else
     {
@@ -629,7 +682,7 @@ std::any sysyCSTVisitor::visitEqExpr(sysyParser::EqExprContext *ctx)
 {
     if (ctx->eqOp())
     {
-        AstNodeType type = std::any_cast<AstNodeType>(visitEqOp(ctx->eqOp()));
+        OperatorType type = std::any_cast<OperatorType>(visitEqOp(ctx->eqOp()));
         AstNode *lOperator = std::any_cast<AstNode *>(visitEqExpr(ctx->eqExpr()));
         AstNode *rOperator = std::any_cast<AstNode *>(visitRelationExpr(ctx->relationExpr()));
         return ast::CreateExprNode(type, lOperator, rOperator);
@@ -644,11 +697,11 @@ std::any sysyCSTVisitor::visitEqOp(sysyParser::EqOpContext *ctx)
 {
     if (ctx->T_EQ())
     {
-        return AstNodeType::OperatorEQ;
+        return OperatorType::OperatorEQ;
     }
     else if (ctx->T_NE())
     {
-        return AstNodeType::OperatorNE;
+        return OperatorType::OperatorNE;
     }
     else
     {
@@ -660,7 +713,7 @@ std::any sysyCSTVisitor::visitLAndExpr(sysyParser::LAndExprContext *ctx)
 {
     if (ctx->T_AND())
     {
-        AstNodeType type = AstNodeType::OperatorAnd;
+        OperatorType type = OperatorType::OperatorAnd;
         AstNode *lOperator = std::any_cast<AstNode *>(visitLAndExpr(ctx->lAndExpr()));
         AstNode *rOperator = std::any_cast<AstNode *>(visitEqExpr(ctx->eqExpr()));
         return ast::CreateExprNode(type, lOperator, rOperator);
@@ -675,7 +728,7 @@ std::any sysyCSTVisitor::visitLOrExpr(sysyParser::LOrExprContext *ctx)
 {
     if (ctx->T_OR())
     {
-        AstNodeType type = AstNodeType::OperatorOr;
+        OperatorType type = OperatorType::OperatorOr;
         AstNode *lOperator = std::any_cast<AstNode *>(visitLOrExpr(ctx->lOrExpr()));
         AstNode *rOperator = std::any_cast<AstNode *>(visitLAndExpr(ctx->lAndExpr()));
         return ast::CreateExprNode(type, lOperator, rOperator);
