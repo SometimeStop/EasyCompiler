@@ -5,11 +5,11 @@ null
 
 token symbolic names:
 null
-T_INT_CONST_TYPE
+T_NUM_VALUE
 T_OPERATOR
 
 rule names:
-T_INT_CONST_TYPE
+T_NUM_VALUE
 T_OPERATOR
 
 channel names:

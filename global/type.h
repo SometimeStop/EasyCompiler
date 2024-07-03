@@ -1,11 +1,13 @@
 #pragma once
-
-enum class BasicType{
+#include <vector>
+enum class BasicType
+{
     TYPE_NULL,
     TYPE_VOID,
-    TYPE_INT,
-    TYPE_ARRAY,
-    TYPE_UKNOWN,
+    TYPE_INT32,
+    TYPE_INT1,
+    TYPE_PTR,
+    TYPE_UNKNOW,
 };
 
 enum class AstNodeType
@@ -18,7 +20,7 @@ enum class AstNodeType
     IdentifierType,
 
     /// @brief int const type (value)
-    IntConstType,
+    NumValueType,
 
     DeclType,
     ConstDeclType,
@@ -48,6 +50,7 @@ enum class StmtType
     StmtAssign,
     StmtExpr,
     StmtIf,
+    StmtBlock,
     StmtWhile,
     StmtBreak,
     StmtContinue,
@@ -59,11 +62,9 @@ enum class OperatorType
     /// @brief operator types
     /// @brief operator "+"
     OperatorAdd,
-    OperatorPos,
 
     /// @brief operator "-"
     OperatorSub,
-    OperatorNeg,
 
     /// @brief operator "*"
     OperatorMul,
@@ -73,9 +74,6 @@ enum class OperatorType
 
     /// @brief operator "%"
     OperatorMod,
-
-    /// @brief operator "!"
-    OperatorNot,
 
     /// @brief operator "<"
     OperatorLT,
@@ -100,4 +98,13 @@ enum class OperatorType
 
     /// @brief operator "||"
     OperatorOr,
+
+    /// @brief Unary operators
+    /// @brief operator "!"
+    OperatorNot,
+    OperatorPos,
+    OperatorNeg,
 };
+
+typedef std::vector<int> Dim;
+typedef std::vector<int> InitList;

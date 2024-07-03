@@ -1477,8 +1477,8 @@ public class sysyParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class PrimaryExprContext extends ParserRuleContext {
-		public ExprContext expr() {
-			return getRuleContext(ExprContext.class,0);
+		public AddExprContext addExpr() {
+			return getRuleContext(AddExprContext.class,0);
 		}
 		public LValContext lVal() {
 			return getRuleContext(LValContext.class,0);
@@ -1505,7 +1505,7 @@ public class sysyParser extends Parser {
 				setState(281);
 				match(T__7);
 				setState(282);
-				expr();
+				addExpr(0);
 				setState(283);
 				match(T__8);
 				}
@@ -1976,8 +1976,8 @@ public class sysyParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class RelationExprContext extends ParserRuleContext {
-		public AddExprContext addExpr() {
-			return getRuleContext(AddExprContext.class,0);
+		public ExprContext expr() {
+			return getRuleContext(ExprContext.class,0);
 		}
 		public RelationExprContext relationExpr() {
 			return getRuleContext(RelationExprContext.class,0);
@@ -2008,7 +2008,7 @@ public class sysyParser extends Parser {
 			{
 			{
 			setState(342);
-			addExpr(0);
+			expr();
 			}
 			_ctx.stop = _input.LT(-1);
 			setState(350);
@@ -2027,7 +2027,7 @@ public class sysyParser extends Parser {
 					setState(345);
 					relationOp();
 					setState(346);
-					addExpr(0);
+					expr();
 					}
 					} 
 				}
@@ -2669,7 +2669,7 @@ public class sysyParser extends Parser {
 		"\u0000\u0000\u0000\u0115\u0118\u0001\u0000\u0000\u0000\u0116\u0114\u0001"+
 		"\u0000\u0000\u0000\u0116\u0117\u0001\u0000\u0000\u0000\u0117)\u0001\u0000"+
 		"\u0000\u0000\u0118\u0116\u0001\u0000\u0000\u0000\u0119\u011a\u0005\b\u0000"+
-		"\u0000\u011a\u011b\u0003$\u0012\u0000\u011b\u011c\u0005\t\u0000\u0000"+
+		"\u0000\u011a\u011b\u00038\u001c\u0000\u011b\u011c\u0005\t\u0000\u0000"+
 		"\u011c\u0120\u0001\u0000\u0000\u0000\u011d\u0120\u0003(\u0014\u0000\u011e"+
 		"\u0120\u0003,\u0016\u0000\u011f\u0119\u0001\u0000\u0000\u0000\u011f\u011d"+
 		"\u0001\u0000\u0000\u0000\u011f\u011e\u0001\u0000\u0000\u0000\u0120+\u0001"+
@@ -2701,9 +2701,9 @@ public class sysyParser extends Parser {
 		"\u0000\u0000\u0150\u0151\u0001\u0000\u0000\u0000\u01519\u0001\u0000\u0000"+
 		"\u0000\u0152\u0150\u0001\u0000\u0000\u0000\u0153\u0154\u0007\u0003\u0000"+
 		"\u0000\u0154;\u0001\u0000\u0000\u0000\u0155\u0156\u0006\u001e\uffff\uffff"+
-		"\u0000\u0156\u0157\u00038\u001c\u0000\u0157\u015e\u0001\u0000\u0000\u0000"+
+		"\u0000\u0156\u0157\u0003$\u0012\u0000\u0157\u015e\u0001\u0000\u0000\u0000"+
 		"\u0158\u0159\n\u0001\u0000\u0000\u0159\u015a\u0003>\u001f\u0000\u015a"+
-		"\u015b\u00038\u001c\u0000\u015b\u015d\u0001\u0000\u0000\u0000\u015c\u0158"+
+		"\u015b\u0003$\u0012\u0000\u015b\u015d\u0001\u0000\u0000\u0000\u015c\u0158"+
 		"\u0001\u0000\u0000\u0000\u015d\u0160\u0001\u0000\u0000\u0000\u015e\u015c"+
 		"\u0001\u0000\u0000\u0000\u015e\u015f\u0001\u0000\u0000\u0000\u015f=\u0001"+
 		"\u0000\u0000\u0000\u0160\u015e\u0001\u0000\u0000\u0000\u0161\u0162\u0007"+

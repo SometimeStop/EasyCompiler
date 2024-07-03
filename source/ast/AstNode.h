@@ -15,7 +15,6 @@ public:
     VarType VType;
     uint32_t IntVal;
     std::string VarId;
-    std::vector<IRInstruction*> Insts;
     bool IsRef;
     /// @brief use variable type to create node
     AstNode(VarType type, int32_t line);

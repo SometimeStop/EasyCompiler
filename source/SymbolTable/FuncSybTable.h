@@ -4,11 +4,13 @@ class FuncSybTable
 {
 public:
     std::unordered_map<std::string, Function *> Functions;
-    bool GetFunc(std::string name, Function*& result);
-    bool GetFuncType(std::string name, BasicType& result);
+    std::vector<Function *> FunctionsOrdered;
+    bool GetFunc(std::string name, Function *&result);
+    bool GetFuncType(std::string name, BasicType &result);
     bool AddFunc(std::string name, Function *func);
     bool HasFunc(std::string name);
 
+    void Print();
     FuncSybTable();
     ~FuncSybTable();
 };

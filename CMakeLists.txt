@@ -53,11 +53,24 @@ set(FRONTEND_SRC
 set(IRGENERATE_SRC
     source/llvmir/IRInstruction.cpp
     source/llvmir/IRInstruction.h
+    source/llvmir/BlockGenerator.cpp
+    source/llvmir/BlockGenerator.h
+    source/llvmir/GlobalGenerator.cpp
+    source/llvmir/GlobalGenerator.h
+    source/llvmir/IRGen.cpp
+    source/llvmir/IRGen.h
+    source/llvmir/irtype.h
 )
 
 set(SYMBOLTABLE_SRC
-    source/SymbolTable/Var.h
-    source/SymbolTable/Var.cpp
+    source/SymbolTable/ID.cpp
+    source/SymbolTable/ID.h
+    source/SymbolTable/FuncSybTable.cpp
+    source/SymbolTable/FuncSybTable.h
+    source/SymbolTable/Function.cpp
+    source/SymbolTable/Function.h
+    source/SymbolTable/VarSybTable.cpp
+    source/SymbolTable/VarSybTable.h
 )
 
 set(GLOBAL_SRC

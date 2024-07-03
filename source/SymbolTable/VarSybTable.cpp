@@ -1,16 +1,17 @@
 #include "VarSybTable.h"
 
-bool VarSybTable::AddVar(std::string name, Var *var)
+bool VarSybTable::AddVar(std::string name, ID *var)
 {
     if (HasVar(name))
     {
         return false;
     }
+    assert(var->IsPtr);
     Variables[name] = var;
     return true;
 }
 
-bool VarSybTable::GetVar(std::string name, Var *&result)
+bool VarSybTable::GetVar(std::string name, ID *&result)
 {
     if (HasVar(name))
     {
@@ -21,7 +22,7 @@ bool VarSybTable::GetVar(std::string name, Var *&result)
     return false;
 }
 
-bool VarSybTable::RecursiveGetVar(std::string name, Var *&result)
+bool VarSybTable::RecursiveGetVar(std::string name, ID *&result)
 {
     if (GetVar(name, result))
     {
@@ -42,7 +43,7 @@ bool VarSybTable::GetVarType(std::string name, BasicType &result)
         result = Variables[name]->Type;
         return true;
     }
-    result = BasicType::TYPE_UKNOWN;
+    result = BasicType::TYPE_UNKNOW;
     return false;
 }
 
@@ -56,7 +57,7 @@ bool VarSybTable::RecursiveGetVarType(std::string name, BasicType &result)
     {
         return Parent->RecursiveGetVarType(name, result);
     }
-    result = BasicType::TYPE_UKNOWN;
+    result = BasicType::TYPE_UNKNOW;
     return false;
 }
 

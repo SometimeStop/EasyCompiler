@@ -37,9 +37,20 @@ enum class IRInsType
     //%[var #3] = icmp slt <type> %[var #2], %[var #1]
     ICmp,
 
-    //br <type:i1> %[syb-var], label %[label-var#1], label %[label-var #2]
+    // label <label-No>
+    Label,
+
+    // br <type:i1> %[syb-var], label %[label-var#1], label %[label-var #2]
+    // br label %[label-var]
+    Br,
+    BrDirect,
+
+    //%[var] = zext <type> %[var] to <type>
+    ZExt,
     //
     GetElementPtr,
+    GetPtr,
+    Global,
 };
 
 enum class ICmpType

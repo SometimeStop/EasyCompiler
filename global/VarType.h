@@ -2,13 +2,19 @@
 #include "type.h"
 #include <string>
 #include <vector>
+
 class VarType
 {
 public:
     BasicType Type;
-    std::vector<int> Dimensions;
+    Dim Dims;
     VarType();
     VarType(BasicType t);
-    operator BasicType&();
+    operator BasicType &();
+    void AppendArray(Dim &dim);
     std::string ToString();
+    std::string ToLowDimString();
+    int PtrDim();
+private:
+    std::string GenPtr(int level);
 };

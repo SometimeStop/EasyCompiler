@@ -162,7 +162,7 @@ void sysyParserInitialize() {
   	1,0,0,0,271,278,5,36,0,0,272,273,5,3,0,0,273,274,3,36,18,0,274,275,5,
   	4,0,0,275,277,1,0,0,0,276,272,1,0,0,0,277,280,1,0,0,0,278,276,1,0,0,0,
   	278,279,1,0,0,0,279,41,1,0,0,0,280,278,1,0,0,0,281,282,5,8,0,0,282,283,
-  	3,36,18,0,283,284,5,9,0,0,284,288,1,0,0,0,285,288,3,40,20,0,286,288,3,
+  	3,56,28,0,283,284,5,9,0,0,284,288,1,0,0,0,285,288,3,40,20,0,286,288,3,
   	44,22,0,287,281,1,0,0,0,287,285,1,0,0,0,287,286,1,0,0,0,288,43,1,0,0,
   	0,289,290,3,74,37,0,290,45,1,0,0,0,291,302,3,42,21,0,292,293,5,36,0,0,
   	293,295,5,8,0,0,294,296,3,50,25,0,295,294,1,0,0,0,295,296,1,0,0,0,296,
@@ -178,8 +178,8 @@ void sysyParserInitialize() {
   	1,0,0,331,332,3,58,29,0,332,333,3,52,26,0,333,335,1,0,0,0,334,330,1,0,
   	0,0,335,338,1,0,0,0,336,334,1,0,0,0,336,337,1,0,0,0,337,57,1,0,0,0,338,
   	336,1,0,0,0,339,340,7,3,0,0,340,59,1,0,0,0,341,342,6,30,-1,0,342,343,
-  	3,56,28,0,343,350,1,0,0,0,344,345,10,1,0,0,345,346,3,62,31,0,346,347,
-  	3,56,28,0,347,349,1,0,0,0,348,344,1,0,0,0,349,352,1,0,0,0,350,348,1,0,
+  	3,36,18,0,343,350,1,0,0,0,344,345,10,1,0,0,345,346,3,62,31,0,346,347,
+  	3,36,18,0,347,349,1,0,0,0,348,344,1,0,0,0,349,352,1,0,0,0,350,348,1,0,
   	0,0,350,351,1,0,0,0,351,61,1,0,0,0,352,350,1,0,0,0,353,354,7,4,0,0,354,
   	63,1,0,0,0,355,356,6,32,-1,0,356,357,3,60,30,0,357,364,1,0,0,0,358,359,
   	10,1,0,0,359,360,3,66,33,0,360,361,3,60,30,0,361,363,1,0,0,0,362,358,
@@ -2065,8 +2065,8 @@ sysyParser::PrimaryExprContext::PrimaryExprContext(ParserRuleContext *parent, si
   : ParserRuleContext(parent, invokingState) {
 }
 
-sysyParser::ExprContext* sysyParser::PrimaryExprContext::expr() {
-  return getRuleContext<sysyParser::ExprContext>(0);
+sysyParser::AddExprContext* sysyParser::PrimaryExprContext::addExpr() {
+  return getRuleContext<sysyParser::AddExprContext>(0);
 }
 
 sysyParser::LValContext* sysyParser::PrimaryExprContext::lVal() {
@@ -2110,7 +2110,7 @@ sysyParser::PrimaryExprContext* sysyParser::primaryExpr() {
         setState(281);
         match(sysyParser::T__7);
         setState(282);
-        expr();
+        addExpr(0);
         setState(283);
         match(sysyParser::T__8);
         break;
@@ -2749,8 +2749,8 @@ sysyParser::RelationExprContext::RelationExprContext(ParserRuleContext *parent, 
   : ParserRuleContext(parent, invokingState) {
 }
 
-sysyParser::AddExprContext* sysyParser::RelationExprContext::addExpr() {
-  return getRuleContext<sysyParser::AddExprContext>(0);
+sysyParser::ExprContext* sysyParser::RelationExprContext::expr() {
+  return getRuleContext<sysyParser::ExprContext>(0);
 }
 
 sysyParser::RelationExprContext* sysyParser::RelationExprContext::relationExpr() {
@@ -2801,7 +2801,7 @@ sysyParser::RelationExprContext* sysyParser::relationExpr(int precedence) {
     size_t alt;
     enterOuterAlt(_localctx, 1);
     setState(342);
-    addExpr(0);
+    expr();
     _ctx->stop = _input->LT(-1);
     setState(350);
     _errHandler->sync(this);
@@ -2819,7 +2819,7 @@ sysyParser::RelationExprContext* sysyParser::relationExpr(int precedence) {
         setState(345);
         relationOp();
         setState(346);
-        addExpr(0); 
+        expr(); 
       }
       setState(352);
       _errHandler->sync(this);

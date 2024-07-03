@@ -13,8 +13,8 @@ AstNode::AstNode(uint32_t value)
     IntVal = value;
     LineNo = -1;
 
-    NodeType = AstNodeType::IntConstType;
-    VType = BasicType::TYPE_INT;
+    NodeType = AstNodeType::NumValueType;
+    VType = BasicType::TYPE_INT32;
     Parent = nullptr;
 }
 
@@ -24,7 +24,7 @@ AstNode::AstNode(std::string id, int32_t line, bool isRef)
     LineNo = line;
     IsRef = isRef;
     NodeType = AstNodeType::IdentifierType;
-    VType = BasicType::TYPE_INT;
+    VType = BasicType::TYPE_INT32;
 }
 
 AstNode::AstNode(AstNodeType type, int32_t line)
@@ -32,7 +32,7 @@ AstNode::AstNode(AstNodeType type, int32_t line)
     NodeType = type;
     LineNo = line;
 
-    VType = BasicType::TYPE_UKNOWN;
+    VType = BasicType::TYPE_UNKNOW;
     Parent = nullptr;
 }
 
@@ -77,7 +77,7 @@ std::string AstNode::ToString()
     case AstNodeType::IdentifierType:
         ret += VType.ToString() + " id: " + VarId;
         break;
-    case AstNodeType::IntConstType:
+    case AstNodeType::NumValueType:
         ret += "int: " + std::to_string(IntVal);
         break;
     case AstNodeType::ConstDeclType:

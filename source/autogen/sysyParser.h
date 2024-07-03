@@ -481,7 +481,7 @@ public:
   public:
     PrimaryExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    ExprContext *expr();
+    AddExprContext *addExpr();
     LValContext *lVal();
     NumberContext *number();
 
@@ -614,7 +614,7 @@ public:
   public:
     RelationExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    AddExprContext *addExpr();
+    ExprContext *expr();
     RelationExprContext *relationExpr();
     RelationOpContext *relationOp();
 

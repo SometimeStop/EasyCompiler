@@ -1,4 +1,4 @@
-// Generated from /home/william/compiler/MyCompiler/source/sysyNode.log by ANTLR 4.13.1
+// Generated from /home/william/compiler/MyCompiler/source/sysyNode.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -16,7 +16,7 @@ public class sysyNodeLexer extends Lexer {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T_INT_CONST_TYPE=1, T_OPERATOR=2;
+		T_NUM_VALUE=1, T_OPERATOR=2;
 	public static String[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
 	};
@@ -27,7 +27,7 @@ public class sysyNodeLexer extends Lexer {
 
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"T_INT_CONST_TYPE", "T_OPERATOR"
+			"T_NUM_VALUE", "T_OPERATOR"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -39,7 +39,7 @@ public class sysyNodeLexer extends Lexer {
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, "T_INT_CONST_TYPE", "T_OPERATOR"
+			null, "T_NUM_VALUE", "T_OPERATOR"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -83,7 +83,7 @@ public class sysyNodeLexer extends Lexer {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "sysyNode.log"; }
+	public String getGrammarFileName() { return "sysyNode.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

@@ -20,6 +20,9 @@ std::string StmtNode::ToString()
     case StmtType::StmtIf:
         ret += "if";
         break;
+    case StmtType::StmtBlock:
+        ret += "block";
+        break;
     case StmtType::StmtWhile:
         ret += "while";
         break;

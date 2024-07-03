@@ -78,7 +78,7 @@ std::any sysyCSTVisitor::visitBType(sysyParser::BTypeContext *ctx)
 {
     if (ctx->T_INT())
     {
-        return BasicType::TYPE_INT;
+        return BasicType::TYPE_INT32;
     }
     else
     {
@@ -242,7 +242,7 @@ std::any sysyCSTVisitor::visitFuncType(sysyParser::FuncTypeContext *ctx)
 {
     if (ctx->T_INT())
     {
-        return BasicType::TYPE_INT;
+        return BasicType::TYPE_INT32;
     }
     else if (ctx->T_VOID())
     {
@@ -399,7 +399,10 @@ std::any sysyCSTVisitor::visitExprStmt(sysyParser::ExprStmtContext *ctx)
 
 std::any sysyCSTVisitor::visitBlockStmt(sysyParser::BlockStmtContext *ctx)
 {
-    return std::any_cast<AstNode *>(visitBlock(ctx->block()));
+    AstNode *blockNode = new StmtNode(StmtType::StmtBlock);
+    auto blockSubNode = std::any_cast<AstNode *>(visitBlock(ctx->block()));
+    ast::InsertAstNode(blockNode, blockSubNode);
+    return blockNode;
 }
 
 std::any sysyCSTVisitor::visitIfStmt(sysyParser::IfStmtContext *ctx)
@@ -490,9 +493,9 @@ std::any sysyCSTVisitor::visitLVal(sysyParser::LValContext *ctx)
 
 std::any sysyCSTVisitor::visitPrimaryExpr(sysyParser::PrimaryExprContext *ctx)
 {
-    if (ctx->expr())
+    if (ctx->addExpr())
     {
-        return visitExpr(ctx->expr());
+        return visitAddExpr(ctx->addExpr());
     }
     else if (ctx->lVal())
     {
@@ -645,12 +648,12 @@ std::any sysyCSTVisitor::visitRelationExpr(sysyParser::RelationExprContext *ctx)
     {
         OperatorType type = std::any_cast<OperatorType>(visitRelationOp(ctx->relationOp()));
         AstNode *lOperator = std::any_cast<AstNode *>(visitRelationExpr(ctx->relationExpr()));
-        AstNode *rOperator = std::any_cast<AstNode *>(visitAddExpr(ctx->addExpr()));
+        AstNode *rOperator = std::any_cast<AstNode *>(visitExpr(ctx->expr()));
         return ast::CreateExprNode(type, lOperator, rOperator);
     }
     else
     {
-        return visitAddExpr(ctx->addExpr());
+        return visitExpr(ctx->expr());
     }
 }
 

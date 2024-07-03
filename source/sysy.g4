@@ -35,7 +35,7 @@ stmt:
 expr: addExpr;
 cond: lOrExpr;
 lVal: T_ID ('[' expr ']')*;
-primaryExpr: '(' expr ')' | lVal | number;
+primaryExpr: '(' addExpr ')' | lVal | number;
 number: intConst;
 unaryExpr:
 	primaryExpr
@@ -47,7 +47,7 @@ mulExpr: unaryExpr | mulExpr mulOp unaryExpr;
 mulOp: T_MUL | T_DIV | T_MOD;
 addExpr: mulExpr | addExpr addOp mulExpr;
 addOp: T_ADD | T_SUB;
-relationExpr: addExpr | relationExpr relationOp addExpr;
+relationExpr: expr | relationExpr relationOp expr;
 relationOp: T_LT | T_GT | T_LE | T_GE;
 eqExpr: relationExpr | eqExpr eqOp relationExpr;
 eqOp: T_EQ | T_NE;
