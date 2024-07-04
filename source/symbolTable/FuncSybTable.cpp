@@ -46,10 +46,13 @@ void FuncSybTable::Print()
 {
     for (int i = 0; i < FunctionsOrdered.size(); i++)
     {
+        if(FunctionsOrdered[i]->IsBuildIn)continue;
         FunctionsOrdered[i]->Print();
     }
 }
 
-FuncSybTable::FuncSybTable() {}
+FuncSybTable::FuncSybTable()
+{
+}
 
 FuncSybTable::~FuncSybTable() {}

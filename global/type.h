@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <utility>
+#include <map>
 enum class BasicType
 {
     TYPE_NULL,
@@ -108,3 +110,4 @@ enum class OperatorType
 
 typedef std::vector<int> Dim;
 typedef std::vector<int> InitList;
+typedef std::map<int, std::vector<int>> BlockPairs;

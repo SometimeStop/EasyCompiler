@@ -9,7 +9,6 @@ public:
     bool GetFuncType(std::string name, BasicType &result);
     bool AddFunc(std::string name, Function *func);
     bool HasFunc(std::string name);
-
     void Print();
     FuncSybTable();
     ~FuncSybTable();

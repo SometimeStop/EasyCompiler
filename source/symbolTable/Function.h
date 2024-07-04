@@ -11,6 +11,8 @@ public:
     IDArgs Args;
     ir::IRInsts AllocaIR;
     ir::IRInsts StdIR;
+    ir::IRInsts AllIR;
+    BlockPairs Pairs;
     int NameNo;
     bool IsBuildIn;
     bool CallExist;
@@ -21,8 +23,8 @@ public:
     int GetArgCount();
     void Print();
     void AssignAllNo();
+    int Prologue();
     ~Function();
-
 private:
     int GetNameNo();
 };

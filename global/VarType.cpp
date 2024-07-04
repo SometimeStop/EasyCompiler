@@ -37,6 +37,9 @@ std::string VarType::ToString()
     case BasicType::TYPE_PTR:
         str = GenPtr(0);
         break;
+    case BasicType::TYPE_INT1:
+        str = "i1";
+        break;
     default:
         str = "Unknown";
         break;

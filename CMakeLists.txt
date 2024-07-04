@@ -63,14 +63,14 @@ set(IRGENERATE_SRC
 )
 
 set(SYMBOLTABLE_SRC
-    source/SymbolTable/ID.cpp
-    source/SymbolTable/ID.h
-    source/SymbolTable/FuncSybTable.cpp
-    source/SymbolTable/FuncSybTable.h
-    source/SymbolTable/Function.cpp
-    source/SymbolTable/Function.h
-    source/SymbolTable/VarSybTable.cpp
-    source/SymbolTable/VarSybTable.h
+    source/symbolTable/ID.cpp
+    source/symbolTable/ID.h
+    source/symbolTable/FuncSybTable.cpp
+    source/symbolTable/FuncSybTable.h
+    source/symbolTable/Function.cpp
+    source/symbolTable/Function.h
+    source/symbolTable/VarSybTable.cpp
+    source/symbolTable/VarSybTable.h
 )
 
 set(GLOBAL_SRC
@@ -100,8 +100,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     source/autogen
     source/src
     source/ast
+    source/symbolTable
     source/llvmir
-    source/SymbolTable
     global
 )
 

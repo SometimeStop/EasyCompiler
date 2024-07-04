@@ -3,19 +3,20 @@ enum class IRInsType
     ///@def <type>:[i32/...]
     ///@def <ptr-type>:[i32*/...]
     ///@def <value>:[imm/%<variable>]
-    ///@def [align-val]: 4(i32)/8(array)
 
-    //%[ptr-var] = alloca <type>, align [align-val]
+    //%[ptr-var] = alloca <type>
+    //%[ptr-var] = global <type> {init list...}
     //*In C: *p = new <type>;
     //*type is strong related to ptr-var
     Alloca,
+    Global,
 
-    //%[var] = load <type>, <ptr-type> %[ptr-var], align [align-val]
+    //%[var] = load <type>, <ptr-type> %[ptr-var]
     //*In C: v = (<type>)*p;
     //*type is strong related to var
     Load,
 
-    // store <type> %var, <ptr-type> %[ptr-var], align [align-val]
+    // store <type> %var, <ptr-type> %[ptr-var]
     //*In C: *p = v;
     Store,
 
@@ -34,7 +35,8 @@ enum class IRInsType
     Mul,
     SDiv,
     SRem,
-    //%[var #3] = icmp slt <type> %[var #2], %[var #1]
+
+    //%[var #3] = icmp [cmp] <type> %[var #2], %[var #1]
     ICmp,
 
     // label <label-No>
@@ -45,12 +47,9 @@ enum class IRInsType
     Br,
     BrDirect,
 
-    //%[var] = zext <type> %[var] to <type>
-    ZExt,
-    //
+    //%[ptr-var]^(dim - 1) = getelementptr %[ptr-var]
     GetElementPtr,
     GetPtr,
-    Global,
 };
 
 enum class ICmpType

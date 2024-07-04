@@ -8,7 +8,7 @@ int main()
 {
     std::string fileName;
     std::string testDir = "/home/william/compiler/MyCompiler/demo/";
-    std::cout << "FileName = 1" << std::endl;
+    std::cout << "[MyCompiler] Input file name = \"1\"" << std::endl;
     fileName = "1";
     AstNode *rootNode;
     AntlrExecutor *executor = new AntlrExecutor(testDir + fileName);
@@ -21,9 +21,9 @@ int main()
     std::string visualization;
     std::cout << "[Ast] Visualize = true!" << std::endl;
     viz::PrintAst(rootNode);
-
     std::cout << "[Ast] Done!" << std::endl;
     IRGen gen(rootNode);
     gen.GenerateIR();
+    viz::PrintBasicBlock(gen.Generator);
     return 0;
 }

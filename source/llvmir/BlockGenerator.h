@@ -45,12 +45,10 @@ protected:
 
     ir::IRInsts *MakeRightRef(AstNode *ref, ID *&idValueOut);
     ir::IRInsts *MakeIDRRef(AstNode *idRef, ID *&idValueOut);
-    ir::IRInsts *MakeArrRRef(AstNode *arrayRef, ID *&idValueOut);
     ir::IRInsts *MakePtrRRef(AstNode *arrayRef, ID *&idPtrOut);
 
     ir::IRInsts *MakeLeftRef(AstNode *ref, ID *&idPtrOut);
     ir::IRInsts *MakeIDLRef(AstNode *idRef, ID *&idPtrOut);
-    ir::IRInsts *MakeArrLRef(AstNode *arrayRef, ID *&idPtrOut);
     ir::IRInsts *MakePtrLRef(AstNode *arrayRef, ID *&idPtrOut);
 
     /// @brief a set of functions that initialize array
@@ -96,7 +94,6 @@ protected:
     ir::IRInsts *MakeRelationInner(AstNode *son, ID *&resultOut);
     ir::IRInsts *MakeRelationOperator(OperatorNode *op, ID *&resultOut);
 
-    ir::ZExt *TryZExt(ID *id, ID *&result);
     ir::IRInsts *MakeExprToBr(ID *judge, ir::Label *trueLabel, ir::Label *falseLabel);
     ir::Alloca *MakeAlloca(ID *&ptr);
     ir::Alloca *MakeAlloca(ID *&ptr, Dim &dim);

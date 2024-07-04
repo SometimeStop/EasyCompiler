@@ -2,7 +2,7 @@
 #include "BlockGenerator.h"
 class GlobalGenerator : public BlockGenerator
 {
-private:
+public:
     FuncSybTable FuncTable;
     Function *CurrentFunc;
     AstNode *Root;
@@ -24,10 +24,11 @@ private:
 
     ir::Global *MakeGlobalAlloca(std::string name, ID *&globSyb, ID *initVal, bool isConst = false);
     ir::Global *MakeGlobalAlloca(std::string name, ID *&globSyb, Dim &dim, InitList *initVal, bool isConst = false);
+    void AddBuildInFunc();
 
-public:
+
     GlobalGenerator(AstNode *compileUnit);
     ir::IRInsts GlobalDeclIRs;
-    void Generate();
+    bool Generate();
     void Print();
 };

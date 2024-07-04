@@ -24,6 +24,7 @@ namespace ir
         std::string &GetComment();
         std::string CmtString();
         virtual bool HotCalculation();
+        virtual int Prologue();
         IRInstruction *MakeComment(std::string cmt);
     };
 
@@ -34,6 +35,7 @@ namespace ir
         std::vector<IRInstruction *> Insts;
         void Append(IRInsts *block);
         void Append(IRInstruction *ins);
+        void Append(IRInsts &block);
         void Insert(IRInsts *block);
         void Insert(IRInstruction *ins);
         bool HotCalculation(int &value);
@@ -50,6 +52,8 @@ namespace ir
         Alloca(ID *ptrVar);
         ID &GetPtrVar();
         std::string ToString() override;
+        ID DeRef();
+        int Prologue() override;
         ~Alloca();
     };
 
@@ -61,6 +65,7 @@ namespace ir
         ID &GetPtrVar();
         std::string ToString() override;
         bool HotCalculation() override;
+        int Prologue() override;
         ~Load();
     };
 
@@ -84,6 +89,7 @@ namespace ir
         IDArgs &Params();
         bool IsVoid();
         std::string ToString() override;
+        int Prologue() override; ///
     };
 
     class Ret : public IRInstruction
@@ -103,6 +109,7 @@ namespace ir
         ID &GetRVar();
         std::string ToString() override;
         bool HotCalculation() override;
+        int Prologue() override;
     };
 
     class Sub : public IRInstruction
@@ -113,6 +120,7 @@ namespace ir
         ID &GetRVar();
         std::string ToString() override;
         bool HotCalculation() override;
+        int Prologue() override;
     };
 
     class Mul : public IRInstruction
@@ -123,6 +131,7 @@ namespace ir
         ID &GetRVar();
         std::string ToString() override;
         bool HotCalculation() override;
+        int Prologue() override;
     };
 
     class SDiv : public IRInstruction
@@ -133,6 +142,7 @@ namespace ir
         ID &GetRVar();
         std::string ToString() override;
         bool HotCalculation() override;
+        int Prologue() override;
     };
 
     class SRem : public IRInstruction
@@ -143,6 +153,7 @@ namespace ir
         ID &GetRVar();
         std::string ToString() override;
         bool HotCalculation() override;
+        int Prologue() override;
     };
 
     class ICmp : public IRInstruction
@@ -151,11 +162,14 @@ namespace ir
         ICmpType CmpType;
         ICmp(ID *res, ICmpType cmpType, ID *lVar, ID *rVar);
         std::string ToString() override;
+        int Prologue() override;
     };
 
     class Label : public IRInstruction
     {
     public:
+        int InstIdx;
+        int AllIdx;
         ID &GetLabelNo();
         Label(ID *labelNo);
         std::string ToString() override;
@@ -176,18 +190,12 @@ namespace ir
         std::string ToString() override;
     };
 
-    class ZExt : public IRInstruction
-    {
-    public:
-        ZExt(ID *res, ID *src);
-        std::string ToString() override;
-    };
-
     class GetElementPtr : public IRInstruction
     {
     public:
         GetElementPtr(ID *ptr, ID *resultPtr, ID *offset);
         std::string ToString() override;
+        int Prologue() override;
     };
 
     class GetPtr : public IRInstruction
@@ -195,6 +203,7 @@ namespace ir
     public:
         GetPtr(ID *ptr, ID *resultVar, ID *offset);
         std::string ToString() override;
+        int Prologue() override;
     };
 
     class Global : public IRInstruction
@@ -204,5 +213,6 @@ namespace ir
         Global(ID *result, ID *initVal);
         Global(ID *result, InitList *initVal);
         std::string ToString() override;
+        int Prologue() override;
     };
 }

@@ -40,6 +40,11 @@ namespace ir
         assert(false && "Hot calculation NOT supported");
     }
 
+    int IRInstruction::Prologue()
+    {
+        assert(false && "Prologue NOT supported");
+    }
+
     IRInstruction *IRInstruction::MakeComment(std::string cmt)
     {
         Comment = cmt;
@@ -59,7 +64,6 @@ namespace ir
         {
             Insts.push_back(inst);
         }
-        delete block;
     }
 
     void IRInsts::Append(IRInstruction *ins)
@@ -69,6 +73,14 @@ namespace ir
             return;
         }
         Insts.push_back(ins);
+    }
+
+    void IRInsts::Append(IRInsts &block)
+    {
+        for (auto inst : block.Insts)
+        {
+            Insts.push_back(inst);
+        }
     }
 
     void IRInsts::Insert(IRInsts *block)
@@ -128,7 +140,27 @@ namespace ir
 
     std::string Alloca::ToString()
     {
-        return std::format("{0} = alloca {1}", Result->ToString(), Result->Type.ToLowDimString());
+        return std::format("{0} = alloca {1}", Result->ToString(), DeRef().Type.ToString());
+    }
+
+    ID Alloca::DeRef()
+    {
+        return *this->Result->ToLowDimPtr();
+    }
+
+    int Alloca::Prologue()
+    {
+        int prologue = 4;
+        auto instance = DeRef();
+        if (instance.Type.PtrDim() == 0)
+        {
+            for (int i = 0; i < instance.Type.Dims.size(); i++)
+            {
+                prologue *= instance.Type.Dims[i];
+            }
+            return prologue;
+        }
+        return prologue;
     }
 
     Alloca::~Alloca() {}
@@ -168,6 +200,11 @@ namespace ir
             return true;
         }
         return false;
+    }
+
+    int Load::Prologue()
+    {
+        return 0;
     }
 
     Load::~Load() {}
@@ -263,6 +300,11 @@ namespace ir
         return ret;
     }
 
+    int Call::Prologue()
+    {
+        return 0;
+    }
+
     Ret::Ret(ID *var)
         : IRInstruction(IRInsType::Ret)
     {
@@ -331,6 +373,11 @@ namespace ir
         return false;
     }
 
+    int Add::Prologue()
+    {
+        return 0;
+    }
+
     Sub::Sub(ID *res, ID *lVar, ID *rVar)
         : IRInstruction(IRInsType::Sub, res)
     {
@@ -364,6 +411,11 @@ namespace ir
             return true;
         }
         return false;
+    }
+
+    int Sub::Prologue()
+    {
+        return 0;
     }
 
     Mul::Mul(ID *res, ID *lVar, ID *rVar)
@@ -401,6 +453,11 @@ namespace ir
         return false;
     }
 
+    int Mul::Prologue()
+    {
+        return 0;
+    }
+
     SDiv::SDiv(ID *res, ID *lVar, ID *rVar)
         : IRInstruction(IRInsType::SDiv, res)
     {
@@ -434,6 +491,11 @@ namespace ir
             return true;
         }
         return false;
+    }
+
+    int SDiv::Prologue()
+    {
+        return 0;
     }
 
     SRem::SRem(ID *res, ID *lVar, ID *rVar)
@@ -471,6 +533,11 @@ namespace ir
         return false;
     }
 
+    int SRem::Prologue()
+    {
+        return 0;
+    }
+
     IRInsts *GenInsts()
     {
         IRInsts *result = new IRInsts();
@@ -487,7 +554,7 @@ namespace ir
 
     std::string Label::ToString()
     {
-        return std::format("{0}:", Result->ToString());
+        return std::format("{0}:", std::to_string(Result->AssignedNumber));
     }
 
     ID &Br::GetCond()
@@ -573,16 +640,9 @@ namespace ir
         return std::format("{0} = icmp {1} {2} {3}, {4}", Result->ToString(), cmpString, Args[0]->Type.ToString(), Args[0]->ToString(), Args[1]->ToString());
     }
 
-    ZExt::ZExt(ID *res, ID *src)
-        : IRInstruction(IRInsType::ZExt, res)
+    int ICmp::Prologue()
     {
-        Args.push_back(src);
-        assert(src->Type == BasicType::TYPE_INT1);
-    }
-
-    std::string ZExt::ToString()
-    {
-        return std::format("{0} = zext {1} {2} to i32", Result->ToString(), Args[0]->Type.ToString(), Args[0]->ToString());
+        return 0;
     }
 
     GetElementPtr::GetElementPtr(ID *ptr, ID *resultPtr, ID *offset)
@@ -597,6 +657,11 @@ namespace ir
         return std::format("{0} = getelementptr {1} {2} {3}, i32 0, {4} {5}", Result->ToString(), Args[0]->Type.ToLowDimString(), Args[0]->Type.ToString(), Args[0]->ToString(), Args[1]->Type.ToString(), Args[1]->ToString());
     }
 
+    int GetElementPtr::Prologue()
+    {
+        return 0;
+    }
+
     GetPtr::GetPtr(ID *ptr, ID *resultPtr, ID *offset)
         : IRInstruction(IRInsType::GetPtr, resultPtr)
     {
@@ -606,6 +671,10 @@ namespace ir
     std::string GetPtr::ToString()
     {
         return std::format("{0} = getelementptr {1} {2} {3}, {4} {5}", Result->ToString(), Args[0]->Type.ToLowDimString(), Args[0]->Type.ToString(), Args[0]->ToString(), Args[1]->Type.ToString(), Args[1]->ToString());
+    }
+    int GetPtr::Prologue()
+    {
+        return 0;
     }
     Global::Global(ID *resultPtr, ID *initVal)
         : IRInstruction(IRInsType::Global, resultPtr)
@@ -635,5 +704,9 @@ namespace ir
         }
         initString += "]";
         return std::format("{0} = global {1} {2}", Result->ToString(), Result->Type.ToLowDimString(), initString);
+    }
+    int Global::Prologue()
+    {
+        return 0;
     }
 }

@@ -1,8 +1,9 @@
 #include "GlobalGenerator.h"
 #include <fstream>
 #include <iostream>
-void GlobalGenerator::Generate()
+bool GlobalGenerator::Generate()
 {
+    AddBuildInFunc();
     for (auto node : Root->Children)
     {
         switch (node->NodeType)
@@ -21,6 +22,9 @@ void GlobalGenerator::Generate()
             break;
         }
     }
+
+    std::cout << "[IRGen] Complete!" << std::endl;
+    return true;
 }
 
 void GlobalGenerator::Print()
@@ -33,7 +37,6 @@ void GlobalGenerator::Print()
     }
     ofs.close();
     FuncTable.Print();
-    std::cout << "[IRGen] complete!" << std::endl;
 }
 
 void GlobalGenerator::MakeFuncDef(AstNode *funcDef)
@@ -54,7 +57,7 @@ void GlobalGenerator::MakeFuncDef(AstNode *funcDef)
         assert(false && "Invalid function def type");
         break;
     }
-    assert(FuncTable.AddFunc(funcDef->VarId, CurrentFunc));
+    assert(FuncTable.AddFunc(funcDef->VarId, CurrentFunc) && "Function redefinition!");
     BlockGenerator *block = new BlockGenerator(FuncTable, &VarIDTable);
     CurrentFunc->AddIR(*block->GenReturn(isVoid));
     CurrentFunc->AddIR(*MakeFuncFormParams(funcFPs, *block));
@@ -270,6 +273,23 @@ ir::Global *GlobalGenerator::MakeGlobalAlloca(std::string name, ID *&globSyb, Di
     globSyb->Type.AppendArray(dim);
     globSyb->IsConst = isConst;
     return new ir::Global(globSyb, initVal);
+}
+
+void GlobalGenerator::AddBuildInFunc()
+{
+    Function *func = nullptr;
+    func = new Function("getint", BasicType::TYPE_INT32, true);
+    FuncTable.AddFunc("getint", func);
+    func = new Function("getch", BasicType::TYPE_INT32, true);
+    FuncTable.AddFunc("getch", func);
+    func = new Function("getarray", BasicType::TYPE_INT32, true);
+    FuncTable.AddFunc("getarray", func);
+    func = new Function("putint", BasicType::TYPE_VOID, true);
+    FuncTable.AddFunc("putint", func);
+    func = new Function("putch", BasicType::TYPE_VOID, true);
+    FuncTable.AddFunc("putch", func);
+    func = new Function("putarray", BasicType::TYPE_VOID, true);
+    FuncTable.AddFunc("putarray", func);
 }
 
 GlobalGenerator::GlobalGenerator(AstNode *compileUnit) : BlockGenerator(FuncTable)

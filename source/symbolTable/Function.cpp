@@ -72,11 +72,16 @@ void Function::Print()
     for (int i = 0; i < AllocaIR.size(); i++)
     {
         ofs << "    " << AllocaIR[i]->ToString() << AllocaIR[i]->CmtString() << std::endl;
+        AllIR.Append(AllocaIR[i]);
     }
     for (int i = 0; i < StdIR.size(); i++)
     {
+        AllIR.Append(StdIR[i]);
         if (StdIR[i]->Type == IRInsType::Label)
         {
+            auto inst = dynamic_cast<ir::Label *>(StdIR[i]);
+            inst->InstIdx = i;
+            inst->AllIdx = i + AllocaIR.size();
             ofs << std::endl
                 << StdIR[i]->ToString()
                 << StdIR[i]->CmtString() << std::endl;
@@ -105,6 +110,11 @@ void Function::AssignAllNo()
             StdIR[i]->Result->AssignedNumber = GetNameNo();
         }
     }
+}
+
+int Function::Prologue()
+{
+    return 0;
 }
 
 Function::~Function() {}

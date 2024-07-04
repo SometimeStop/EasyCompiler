@@ -233,25 +233,6 @@ ir::IRInsts *BlockGenerator::MakeIDRRef(AstNode *idRef, ID *&idValueOut)
     return insts;
 }
 
-ir::IRInsts *BlockGenerator::MakeArrRRef(AstNode *arrayRef, ID *&idValueOut)
-{
-    int dim = 0;
-    ID *ptr = nullptr;
-    ID *result = nullptr;
-    auto insts = ir::GenInsts();
-    insts->Append(MakeArrLRef(arrayRef, ptr));
-    assert(VarIDTable.RecursiveGetVar(arrayRef->VarId, result));
-    if (arrayRef->Children.empty() || arrayRef->Children[0]->Children.size() < result->Type.Dims.size())
-    {
-        insts->Append(MakeGetElementPtr(ptr, idValueOut, MakeNum(0)));
-    }
-    else
-    {
-        insts->Append(MakeLoad(ptr, idValueOut));
-    }
-    return insts;
-}
-
 ir::IRInsts *BlockGenerator::MakePtrRRef(AstNode *arrayRef, ID *&idPtrOut)
 {
     int dim = 0;
@@ -297,27 +278,6 @@ ir::IRInsts *BlockGenerator::MakeIDLRef(AstNode *idRef, ID *&idPtrOut)
 {
     assert(VarIDTable.RecursiveGetVar(idRef->VarId, idPtrOut));
     return nullptr;
-}
-
-ir::IRInsts *BlockGenerator::MakeArrLRef(AstNode *arrayRef, ID *&idPtrOut)
-{
-    if (arrayRef->Children.empty())
-    {
-        assert(VarIDTable.RecursiveGetVar(arrayRef->VarId, idPtrOut));
-        return nullptr;
-    }
-    auto arrDim = arrayRef->Children[0];
-    auto insts = ir::GenInsts();
-    ID *ptr = nullptr;
-    assert(VarIDTable.RecursiveGetVar(arrayRef->VarId, ptr));
-    for (auto expr : arrDim->Children)
-    {
-        ID *offset = nullptr;
-        insts->Append(MakeExpr(expr, offset));
-        insts->Append(MakeGetElementPtr(ptr, ptr, offset));
-    }
-    idPtrOut = ptr;
-    return insts;
 }
 
 ir::IRInsts *BlockGenerator::MakePtrLRef(AstNode *arrayRef, ID *&idPtrOut)
@@ -609,7 +569,7 @@ ir::IRInsts *BlockGenerator::MakeExprOperator(OperatorNode *op, ID *&resultOut)
 ir::IRInsts *BlockGenerator::MakeFuncCall(AstNode *func, ID *&resultOut)
 {
     Function *callTarget = nullptr;
-    assert(FuncTable.GetFunc(func->VarId, callTarget));
+    assert(FuncTable.GetFunc(func->VarId, callTarget) && "Function not defined!");
     AstNode *paramsNode = func->Children[0];
     IDArgs *args = nullptr;
     auto insts = ir::GenInsts();
@@ -660,16 +620,6 @@ ir::IRInsts *BlockGenerator::MakeBinaryOperator(OperatorNode *op, ID *&resultOut
     ID *rightResult = nullptr;
     insts->Append(MakeExprInner(left, leftResult));
     insts->Append(MakeExprInner(right, rightResult));
-    ir::ZExt *lZExt = TryZExt(leftResult, leftResult);
-    if (lZExt != nullptr)
-    {
-        insts->Append(lZExt);
-    }
-    ir::ZExt *rZExt = TryZExt(rightResult, rightResult);
-    if (rZExt != nullptr)
-    {
-        insts->Append(rZExt);
-    }
     ir::IRInstruction *opInst = nullptr;
     switch (op->SubNodeType)
     {
@@ -757,11 +707,6 @@ ir::IRInsts *BlockGenerator::MakeUnaryOperator(OperatorNode *op, ID *&resultOut)
     {
         auto insts = ir::GenInsts();
         insts->Append(MakeExprInner(son, resultOut));
-        ir::ZExt *zExt = TryZExt(resultOut, resultOut);
-        if (zExt != nullptr)
-        {
-            insts->Append(zExt);
-        }
         return insts;
     }
     case OperatorType::OperatorNeg:
@@ -769,11 +714,6 @@ ir::IRInsts *BlockGenerator::MakeUnaryOperator(OperatorNode *op, ID *&resultOut)
         ID *sonResult = nullptr;
         auto insts = ir::GenInsts();
         insts->Append(MakeExprInner(son, sonResult));
-        ir::ZExt *zExt = TryZExt(sonResult, sonResult);
-        if (zExt != nullptr)
-        {
-            insts->Append(zExt);
-        }
         auto inst = MakeSub(MakeNum(0), sonResult, resultOut);
         insts->Append(inst);
         return insts;
@@ -783,11 +723,6 @@ ir::IRInsts *BlockGenerator::MakeUnaryOperator(OperatorNode *op, ID *&resultOut)
         ID *sonResult = nullptr;
         auto insts = ir::GenInsts();
         insts->Append(MakeExprInner(son, sonResult));
-        ir::ZExt *zExt = TryZExt(sonResult, sonResult);
-        if (zExt != nullptr)
-        {
-            insts->Append(zExt);
-        }
         insts->Append(MakeICmp(sonResult, ICmpType::NE, MakeNum(0), resultOut));
         return insts;
     }
@@ -799,7 +734,7 @@ ir::IRInsts *BlockGenerator::MakeUnaryOperator(OperatorNode *op, ID *&resultOut)
 
 ir::ICmp *BlockGenerator::MakeICmp(ID *left, ICmpType cmpType, ID *right, ID *&resultOut)
 {
-    resultOut = new ID(BasicType::TYPE_INT1);
+    resultOut = new ID(BasicType::TYPE_INT32);
     return new ir::ICmp(resultOut, cmpType, left, right);
 }
 
@@ -1084,16 +1019,6 @@ ir::IRInsts *BlockGenerator::MakeRelationOperator(OperatorNode *op, ID *&resultO
     ID *rightResult = nullptr;
     insts->Append(MakeRelationInner(left, leftResult));
     insts->Append(MakeRelationInner(right, rightResult));
-    auto lZExt = TryZExt(leftResult, leftResult);
-    auto rZExt = TryZExt(rightResult, rightResult);
-    if (lZExt != nullptr)
-    {
-        insts->Append(lZExt);
-    }
-    if (rZExt != nullptr)
-    {
-        insts->Append(rZExt);
-    }
     ICmpType cmpType;
     switch (op->SubNodeType)
     {
@@ -1121,16 +1046,6 @@ ir::IRInsts *BlockGenerator::MakeRelationOperator(OperatorNode *op, ID *&resultO
     }
     insts->Append(MakeICmp(leftResult, cmpType, rightResult, resultOut));
     return insts;
-}
-
-ir::ZExt *BlockGenerator::TryZExt(ID *id, ID *&result)
-{
-    if (id->Type == BasicType::TYPE_INT1)
-    {
-        result = new ID(BasicType::TYPE_INT32);
-        return new ir::ZExt(result, id);
-    }
-    return nullptr;
 }
 
 ir::IRInsts *BlockGenerator::MakeExprToBr(ID *judge, ir::Label *trueLabel, ir::Label *falseLabel)
