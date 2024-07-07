@@ -68,27 +68,34 @@ BlockPairs viz::VisitBasicBlock(Agraph_t *g, ir::IRInsts *insts)
     block[0] = agnode(g, (char *)nullptr, 1);
     int last = 0;
     std::string instStr = "";
+    bool flag = false;
     for (int i = 0; i < insts->size(); i++)
     {
         auto inst = insts->Insts[i];
+        if (flag)
+        {
+            block[i] = agnode(g, (char *)nullptr, 1);
+            last = i;
+            flag = false;
+        }
+
         if (inst->Type == IRInsType::BrDirect || inst->Type == IRInsType::Br)
         {
             instStr += inst->ToString() + "\n";
             agsafeset(block[last], (char *)"label", (char *)instStr.c_str(), (char *)"");
             agsafeset(block[last], (char *)"shape", (char *)"box", (char *)"");
             instStr = "";
+            flag = true;
         }
         else if (inst->Type == IRInsType::Label)
         {
-            if (i != 0)
+            if (i != 0 && last != i)
             {
                 block[i] = agnode(g, (char *)nullptr, 1);
                 last = i;
                 instStr = "";
-                instStr += inst->ToString() + "\n";
-                agsafeset(block[last], (char *)"label", (char *)instStr.c_str(), (char *)"");
-                agsafeset(block[last], (char *)"shape", (char *)"box", (char *)"");
             }
+            instStr += inst->ToString() + "\n";
         }
         else if (inst->Type == IRInsType::Ret)
         {
@@ -105,13 +112,14 @@ BlockPairs viz::VisitBasicBlock(Agraph_t *g, ir::IRInsts *insts)
     }
     auto thisBlock = block[0];
     int thisIdx = 0;
-    bool flag = false;
+    flag = false;
     for (int i = 0; i < insts->size(); i++)
     {
         if (flag)
         {
             thisBlock = block[i];
             thisIdx = i;
+            flag = false;
         }
 
         auto inst = insts->Insts[i];

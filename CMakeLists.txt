@@ -62,6 +62,18 @@ set(IRGENERATE_SRC
     source/llvmir/irtype.h
 )
 
+set(ASMGENERATE_SRC
+    source/codegen/AsmCodeGenerator.cpp
+    source/codegen/AsmCodeGenerator.h
+    source/codegen/regman.cpp
+    source/codegen/regman.h
+    source/codegen/riscvasm.cpp
+    source/codegen/riscvasm.h
+    source/codegen/riscvfunc.cpp
+    source/codegen/riscvfunc.h
+    source/codegen/riscvtype.h
+)
+
 set(SYMBOLTABLE_SRC
     source/symbolTable/ID.cpp
     source/symbolTable/ID.h
@@ -86,6 +98,7 @@ add_executable(${PROJECT_NAME}
     ${GLOBAL_SRC}
     ${IRGENERATE_SRC}
     ${SYMBOLTABLE_SRC}
+    ${ASMGENERATE_SRC}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -102,6 +115,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     source/ast
     source/symbolTable
     source/llvmir
+    source/codegen
     global
 )
 

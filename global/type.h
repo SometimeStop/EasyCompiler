@@ -108,6 +108,46 @@ enum class OperatorType
     OperatorNeg,
 };
 
+enum class ABI : int
+{
+    zero,
+    ra,
+    sp,
+    gp,
+    tp,
+    t0,
+    t1,
+    t2,
+    s0,
+    s1,
+    a0 = 10,
+    a1,
+    a2,
+    a3,
+    a4,
+    a5,
+    a6,
+    a7,
+    s2 = 18,
+    s3,
+    s4,
+    s5,
+    s6,
+    s7,
+    s8,
+    s9,
+    s10,
+    s11,
+    t3 = 28,
+    t4,
+    t5,
+    t6,
+    TOP = 32,
+};
+
+// Var->GetSPOffset <=> [imm12]
+// SP                  <=>  (rs1)
+
 typedef std::vector<int> Dim;
 typedef std::vector<int> InitList;
 typedef std::map<int, std::vector<int>> BlockPairs;

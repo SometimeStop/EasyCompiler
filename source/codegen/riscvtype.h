@@ -1,3 +1,4 @@
+#pragma once
 enum class AsmType
 {
     BEQZ,
@@ -26,4 +27,7 @@ enum class AsmType
     LI,
     LA,
     MV,
+    DESC,
+    LABEL,
+    TAB,
 };

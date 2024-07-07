@@ -251,7 +251,6 @@ void GlobalGenerator::MakeGArrInitLevel(AstNode *arrInitLevel, int level, int &c
     {
         ID *ptr = nullptr;
         CurrentInitList->push_back(0);
-        ++currIdx;
     }
 }
 

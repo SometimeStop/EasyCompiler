@@ -1,5 +1,6 @@
+#pragma once
 #include "riscvasm.h"
 namespace rv
 {
-    Asms* GenAsms();
+    RVAsms* GenAsms();
 }

@@ -144,10 +144,10 @@ ID *ID::ToLowDimPtr()
     tmp.erase(tmp.begin(), tmp.begin() + 1);
     assert(tmp.size() == Type.Dims.size() - 1);
     lower->Type.AppendArray(tmp);
-    if (lower->Type.Dims.size() == 1)
-    {
-        lower->Type.Dims[0] = 0;
-    }
+    // if (lower->Type.Dims.size() == 1)
+    // {
+    //     lower->Type.Dims[0] = 0;
+    // }
     return lower;
 }
 

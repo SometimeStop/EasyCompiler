@@ -150,7 +150,7 @@ namespace ir
 
     int Alloca::Prologue()
     {
-        int prologue = 4;
+        int prologue = 8;
         auto instance = DeRef();
         if (instance.Type.PtrDim() == 0)
         {
@@ -158,9 +158,9 @@ namespace ir
             {
                 prologue *= instance.Type.Dims[i];
             }
-            return prologue;
+            return prologue + 8;
         }
-        return prologue;
+        return prologue + 8;
     }
 
     Alloca::~Alloca() {}
@@ -204,7 +204,7 @@ namespace ir
 
     int Load::Prologue()
     {
-        return 0;
+        return 8;
     }
 
     Load::~Load() {}
@@ -302,7 +302,18 @@ namespace ir
 
     int Call::Prologue()
     {
-        return 0;
+
+        return Result == nullptr ? 0 : 8;
+    }
+
+    int Call::ArgPrologue()
+    {
+        int total = 0;
+        if (Args.size() > 8)
+        {
+            total += (Args.size() - 8) * 8;
+        }
+        return total;
     }
 
     Ret::Ret(ID *var)
@@ -375,7 +386,7 @@ namespace ir
 
     int Add::Prologue()
     {
-        return 0;
+        return 8;
     }
 
     Sub::Sub(ID *res, ID *lVar, ID *rVar)
@@ -415,7 +426,7 @@ namespace ir
 
     int Sub::Prologue()
     {
-        return 0;
+        return 8;
     }
 
     Mul::Mul(ID *res, ID *lVar, ID *rVar)
@@ -455,7 +466,7 @@ namespace ir
 
     int Mul::Prologue()
     {
-        return 0;
+        return 8;
     }
 
     SDiv::SDiv(ID *res, ID *lVar, ID *rVar)
@@ -495,7 +506,7 @@ namespace ir
 
     int SDiv::Prologue()
     {
-        return 0;
+        return 8;
     }
 
     SRem::SRem(ID *res, ID *lVar, ID *rVar)
@@ -535,7 +546,7 @@ namespace ir
 
     int SRem::Prologue()
     {
-        return 0;
+        return 8;
     }
 
     IRInsts *GenInsts()
@@ -546,15 +557,18 @@ namespace ir
 
     ID &Label::GetLabelNo()
     {
-        return *Result;
+        return *Args[0];
     }
 
     Label::Label(ID *labelNo)
-        : IRInstruction(IRInsType::Label, labelNo) {}
+        : IRInstruction(IRInsType::Label)
+    {
+        Args.push_back(labelNo);
+    }
 
     std::string Label::ToString()
     {
-        return std::format("{0}:", std::to_string(Result->AssignedNumber));
+        return std::format("{0}:", std::to_string(Args[0]->AssignedNumber));
     }
 
     ID &Br::GetCond()
@@ -595,11 +609,11 @@ namespace ir
     {
         if (Type == IRInsType::BrDirect)
         {
-            return std::format("br label {0}", NonCondLabel->Result->ToString());
+            return std::format("br label {0}", NonCondLabel->Args[0]->ToString());
         }
         else
         {
-            return std::format("br i1 {0}, label {1}, label {2}", Args[0]->ToString(), TrueLabel->Result->ToString(), FalseLabel->Result->ToString());
+            return std::format("br i32 {0}, label {1}, label {2}", Args[0]->ToString(), TrueLabel->Args[0]->ToString(), FalseLabel->Args[0]->ToString());
         }
     }
 
@@ -642,7 +656,7 @@ namespace ir
 
     int ICmp::Prologue()
     {
-        return 0;
+        return 8;
     }
 
     GetElementPtr::GetElementPtr(ID *ptr, ID *resultPtr, ID *offset)
@@ -659,6 +673,19 @@ namespace ir
 
     int GetElementPtr::Prologue()
     {
+        return 8;
+    }
+
+    int GetElementPtr::Offset()
+    {
+        auto type = Args[0]->Type;
+        for (int i = 0; i < type.Dims.size(); i++)
+        {
+            if (type.Dims[i] != 0)
+            {
+                return type.Dims[i] * 4;
+            }
+        }
         return 0;
     }
 
@@ -674,7 +701,7 @@ namespace ir
     }
     int GetPtr::Prologue()
     {
-        return 0;
+        return 8;
     }
     Global::Global(ID *resultPtr, ID *initVal)
         : IRInstruction(IRInsType::Global, resultPtr)

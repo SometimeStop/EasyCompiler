@@ -2,8 +2,9 @@
 
 namespace rv
 {
-    Asms *GenAsms()
+    RVAsms *GenAsms()
     {
-        return new Asms();
+        RVAsms *rvAsms = new RVAsms();
+        return rvAsms;
     }
 }

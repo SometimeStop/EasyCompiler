@@ -1,4 +1,5 @@
 #include "VarType.h"
+#include <cassert>
 VarType::VarType()
 {
     Type = BasicType::TYPE_NULL;
@@ -73,6 +74,37 @@ int VarType::PtrDim()
         }
     }
     return cnt;
+}
+
+int VarType::GetPtrDim()
+{
+    for (int i = 0; i < Dims.size(); i++)
+    {
+        if (Dims[i] != 0)
+        {
+            return Dims[i] * 8;
+        }
+    }
+    return 8;
+}
+
+int VarType::GetElePtrDim()
+{
+    for (int i = 0; i < Dims.size(); i++)
+    {
+        if (Dims[i] != 0)
+        {
+            if (i + 1 == Dims.size())
+            {
+                return 8;
+            }
+            else
+            {
+                return Dims[i + 1] * 8;
+            }
+        }
+    }
+    return 0;
 }
 
 std::string VarType::GenPtr(int level)

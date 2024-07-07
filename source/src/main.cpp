@@ -4,6 +4,7 @@
 #include <iostream>
 #include "AstNode.h"
 #include "visualization.h"
+#include "AsmCodeGenerator.h"
 int main()
 {
     std::string fileName;
@@ -19,11 +20,14 @@ int main()
     }
     std::cout << "[Ast] Generate complete!" << std::endl;
     std::string visualization;
-    std::cout << "[Ast] Visualize = true!" << std::endl;
-    viz::PrintAst(rootNode);
+    std::cout << "[Ast] Visualize = false!" << std::endl;
+    // viz::PrintAst(rootNode);
     std::cout << "[Ast] Done!" << std::endl;
     IRGen gen(rootNode);
     gen.GenerateIR();
-    viz::PrintBasicBlock(gen.Generator);
+    // viz::PrintBasicBlock(gen.Generator);
+    AsmPlainCodeGenerator finalGenerator(gen.Generator);
+    finalGenerator.Run();
+    std::cout << "[Easy Code Gen] Done!" << std::endl;
     return 0;
 }

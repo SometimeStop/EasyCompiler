@@ -89,7 +89,8 @@ namespace ir
         IDArgs &Params();
         bool IsVoid();
         std::string ToString() override;
-        int Prologue() override; ///
+        int Prologue() override;
+        int ArgPrologue();
     };
 
     class Ret : public IRInstruction
@@ -196,6 +197,7 @@ namespace ir
         GetElementPtr(ID *ptr, ID *resultPtr, ID *offset);
         std::string ToString() override;
         int Prologue() override;
+        int Offset();
     };
 
     class GetPtr : public IRInstruction

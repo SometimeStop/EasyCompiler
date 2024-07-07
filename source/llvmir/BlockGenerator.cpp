@@ -204,7 +204,7 @@ ir::IRInsts *BlockGenerator::MakeRightRef(AstNode *ref, ID *&idValueOut)
 {
     ID *result = nullptr;
     assert(VarIDTable.RecursiveGetVar(ref->VarId, result));
-    if (result->Type.Dims.size() >= 1)
+    if (result->Type.Dims.size() > 1)
     {
         return MakePtrRRef(ref, idValueOut);
     }
@@ -432,7 +432,7 @@ int BlockGenerator::GetLevel(int currIdx)
     int level = -1;
     int product = 1;
     int idx = currIdx;
-    for (int i = CurrentArray->Type.Dims.size() - 1; i > 0; i--)
+    for (int i = CurrentArray->Type.Dims.size() - 1; i > 1; i--)
     {
         product *= CurrentArray->Type.Dims[i];
         if (idx % product != 0)
@@ -723,7 +723,7 @@ ir::IRInsts *BlockGenerator::MakeUnaryOperator(OperatorNode *op, ID *&resultOut)
         ID *sonResult = nullptr;
         auto insts = ir::GenInsts();
         insts->Append(MakeExprInner(son, sonResult));
-        insts->Append(MakeICmp(sonResult, ICmpType::NE, MakeNum(0), resultOut));
+        insts->Append(MakeICmp(sonResult, ICmpType::EQ, MakeNum(0), resultOut));
         return insts;
     }
     default:
@@ -839,6 +839,10 @@ ir::IRInsts *BlockGenerator::MakeIfStmt(StmtNode *ifStmt)
 ir::IRInsts *BlockGenerator::MakeExprStmt(StmtNode *exprStmt)
 {
     ID *result = nullptr;
+    if (exprStmt->Children.empty())
+    {
+        return ir::GenInsts();
+    }
     return MakeExpr(exprStmt->Children[0], result);
 }
 

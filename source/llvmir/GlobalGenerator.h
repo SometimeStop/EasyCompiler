@@ -26,7 +26,6 @@ public:
     ir::Global *MakeGlobalAlloca(std::string name, ID *&globSyb, Dim &dim, InitList *initVal, bool isConst = false);
     void AddBuildInFunc();
 
-
     GlobalGenerator(AstNode *compileUnit);
     ir::IRInsts GlobalDeclIRs;
     bool Generate();

@@ -109,6 +109,10 @@ void Function::AssignAllNo()
         {
             StdIR[i]->Result->AssignedNumber = GetNameNo();
         }
+        else if (StdIR[i]->Type == IRInsType::Label)
+        {
+            StdIR[i]->Args[0]->AssignedNumber = GetNameNo();
+        }
     }
 }
 

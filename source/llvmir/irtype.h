@@ -28,6 +28,20 @@ enum class IRInsType
     // ret void
     Ret,
 
+    // label <label-No>
+    Label,
+
+    // br <type:i1> %[syb-var], label %[label-var#1], label %[label-var #2]
+    // br label %[label-var]
+    Br,
+    BrDirect,
+
+    //%[ptr-var]^(dim - 1) = getelementptr %[ptr-var]^(dim)
+    //%[ptr-var]^(dim) = getptr %[ptr-var]^(dim)
+    GetElementPtr,
+    GetPtr,
+
+    /// @brief binary operators
     //%[var #3] = add/sub/mul nsw <type> %[var #1], %[var #2]
     //%[var #3] = sdiv/srem <type> %[var #1], %[var #2]
     Add,
@@ -38,18 +52,6 @@ enum class IRInsType
 
     //%[var #3] = icmp [cmp] <type> %[var #2], %[var #1]
     ICmp,
-
-    // label <label-No>
-    Label,
-
-    // br <type:i1> %[syb-var], label %[label-var#1], label %[label-var #2]
-    // br label %[label-var]
-    Br,
-    BrDirect,
-
-    //%[ptr-var]^(dim - 1) = getelementptr %[ptr-var]
-    GetElementPtr,
-    GetPtr,
 };
 
 enum class ICmpType

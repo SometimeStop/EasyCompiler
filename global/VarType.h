@@ -15,6 +15,8 @@ public:
     std::string ToString();
     std::string ToLowDimString();
     int PtrDim();
+    int GetPtrDim();
+    int GetElePtrDim();
 private:
     std::string GenPtr(int level);
 };

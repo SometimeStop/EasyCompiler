@@ -1,3 +1,4 @@
+#pragma once
 #include "type.h"
 #include "riscvtype.h"
 #include <cstdint>
@@ -9,26 +10,53 @@ public:
     Oprd();
 };
 
-class Reg : public Oprd
+class Register : public Oprd
 {
 public:
-    int32_t *RegNo;
-    Reg(int32_t *regNo);
+    ABI ABINo;
+    ABI ToABI();
+    int ToInt();
+    Register(ABI abi);
+    Register(int abi);
+    std::string ToString();
 };
 
 class Imm : public Oprd
 {
 public:
     bool IsImm12;
-    int32_t ImmVal;
-    Imm(int32_t immVal, bool isImm12 = true);
+    int ImmVal;
+    int *Sp;
+    Imm();
+    Imm(int immVal, bool isImm12 = true, int *sp = nullptr);
 };
 
+class Var
+{
+private:
+    bool StackSet;
 
+public:
+    bool InStack;
+    bool InReg;
+    Imm ImmOffset;
+    Register *Reg;
+    int GetOffset();
+    Imm *GetImm12Offset();
+    void SetInReg(Register *reg);
+    void OnlyInReg();
+    void SetInStack(int offset, int *sp);
+    void SetInStack();
+    void AllocInStack(int offset, int *sp);
+    void OnlyInStack();
+    Var();
+    Var(int offset, int *sp);
+    Var(Register *reg);
+};
 
 namespace rv
 {
-    typedef std::vector<Reg *> RegList;
+    typedef std::vector<Register *> RegList;
     typedef std::string Label;
 
     class riscvasm
@@ -36,39 +64,74 @@ namespace rv
     public:
         AsmType Type;
         RegList Srcs;
-        Reg *DstReg;
+        Register *DstReg;
         Imm *ImmVal;
-        Label *Lbl;
+        Label Lbl;
+        std::string Comment;
+        riscvasm();
         riscvasm(AsmType t);
-        Reg *&rd();
-        Reg *&rs1();
-        Reg *&rs2();
+        Register *&rd();
+        Register *&rs1();
+        Register *&rs2();
         Imm *&imm();
+        virtual std::string ToString();
+        riscvasm *Cmt(std::string in);
+    };
+
+    class RVAsms
+    {
+    public:
+        RVAsms();
+        std::vector<riscvasm *> Asms;
+        void Append(riscvasm *rvasm);
+        void Append(RVAsms *rvasms);
+        void Append(RVAsms &rvasms);
+        void Insert(riscvasm *rvasm);
+        void Insert(RVAsms *rvasms);
+    };
+
+    class split : public riscvasm
+    {
+    public:
+        std::string show;
+        split(std::string desc);
+        std::string ToString() override;
+    };
+
+    class label : public riscvasm
+    {
+    public:
+        label(Label label);
+        std::string ToString() override;
     };
 
     class beqz : public riscvasm
     {
     public:
-        beqz(Reg *rs, Label *lb);
+        beqz(Register *rs, Label lb);
+        std::string ToString() override;
     };
 
     class bnez : public riscvasm
     {
     public:
-        bnez(Reg *rs, Label *lb);
+        bnez(Register *rs, Label lb);
+        std::string ToString() override;
     };
 
     class j : public riscvasm
     {
     public:
-        j(Label *lb);
+        j(Label lb);
+        std::string ToString() override;
     };
 
     class call : public riscvasm
     {
     public:
         // call label
-        call(Label *lb);
+        call(Label lb);
+        std::string ToString() override;
     };
 
     class ret : public riscvasm
@@ -76,112 +139,127 @@ namespace rv
     public:
         // ret
         ret();
+        std::string ToString() override;
     };
 
-    class lw : public riscvasm
+    class ld : public riscvasm
     {
     public:
         // rd[imm12] => rs
-        lw(Reg *rs, Reg *rd, Imm *imm12);
+        ld(Register *rs, Register *rd, Imm *imm12);
+        std::string ToString() override;
     };
 
-    class sw : public riscvasm
+    class sd : public riscvasm
     {
     public:
         // rs2 => rs1[imm12]
-        sw(Reg *rs2, Reg *rs1, Imm *imm12);
+        sd(Register *rs2, Register *rs1, Imm *imm12);
+        std::string ToString() override;
     };
 
     class add : public riscvasm
     {
     public:
         // rs1 + rs2 => rd
-        add(Reg *rd, Reg *rs1, Reg *rs2);
+        add(Register *rd, Register *rs1, Register *rs2);
+        std::string ToString() override;
     };
 
     class addi : public riscvasm
     {
     public:
         // rs1 + imm12 => rd
-        addi(Reg *rd, Reg *rs1, Imm *imm12);
+        addi(Register *rd, Register *rs1, Imm *imm12);
+        std::string ToString() override;
     };
 
     class sub : public riscvasm
     {
     public:
         // rs1 - rs2 => rd
-        sub(Reg *rd, Reg *rs1, Reg *rs2);
+        sub(Register *rd, Register *rs1, Register *rs2);
+        std::string ToString() override;
     };
 
     class slt : public riscvasm
     {
     public:
         // rs1 < rs2 ? 1 : 0 => rd
-        slt(Reg *rd, Reg *rs1, Reg *rs2);
+        slt(Register *rd, Register *rs1, Register *rs2);
+        std::string ToString() override;
     };
 
     class sgt : public riscvasm
     {
     public:
         // rs1 > rs2 ? 1 : 0 => rd
-        sgt(Reg *rd, Reg *rs1, Reg *rs2);
+        sgt(Register *rd, Register *rs1, Register *rs2);
+        std::string ToString() override;
     };
 
     class seqz : public riscvasm
     {
     public:
         // rs == 0 ? 1 : 0 => rd
-        seqz(Reg *rd, Reg *rs);
+        seqz(Register *rd, Register *rs);
+        std::string ToString() override;
     };
 
     class snez : public riscvasm
     {
     public:
         // rs != 0 ? 1 : 0 => rd
-        snez(Reg *rd, Reg *rs);
+        snez(Register *rd, Register *rs);
+        std::string ToString() override;
     };
 
     class mul : public riscvasm
     {
     public:
         // rs1 * rs2 => rd
-        mul(Reg *rd, Reg *rs1, Reg *rs2);
+        mul(Register *rd, Register *rs1, Register *rs2);
+        std::string ToString() override;
     };
 
     class div : public riscvasm
     {
     public:
         // rs1 / rs2 => rd
-        div(Reg *rd, Reg *rs1, Reg *rs2);
+        div(Register *rd, Register *rs1, Register *rs2);
+        std::string ToString() override;
     };
 
     class rem : public riscvasm
     {
     public:
         // rs1 % rs2 => rd
-        rem(Reg *rd, Reg *rs1, Reg *rs2);
+        rem(Register *rd, Register *rs1, Register *rs2);
+        std::string ToString() override;
     };
 
     class li : public riscvasm
     {
     public:
         // imm => rd
-        li(Reg *rd, Imm *imm);
+        li(Register *rd, Imm *imm);
+        std::string ToString() override;
     };
 
     class la : public riscvasm
     {
     public:
         // addr(label) => rd
-        la(Reg *rd, Label *label);
+        la(Register *rd, Label label);
+        std::string ToString() override;
     };
 
     class mv : public riscvasm
     {
     public:
         // rs => rd
-        mv(Reg *rd, Reg *rs);
+        mv(Register *rd, Register *rs);
+        std::string ToString() override;
     };
 
-    typedef std::vector<riscvasm *> Asms;
 }
