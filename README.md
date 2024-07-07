@@ -8,10 +8,12 @@ A simple implemention of sys-y compiler
 ## Backend
 - a simple risc-v code generator with all variables saved in stack
 ## Start
+### Support
+1. this project originally runs on Ubuntu 22.04, or you can use wsl instead
 ### Something need to be done...
 1. be sure to install Antlr-4.12.0 and its run-time library correctly
 2. be sure to install JDK
-3. be sure to install Graphviz inorder to visualize the AST and basic blocks
+3. be sure to install Graphviz in order to visualize the AST and basic blocks
 4. be sure to install riscv64-linux-gnu-gcc
 5. be sure to install qemu-riscv64-static
 ### Getting Started
